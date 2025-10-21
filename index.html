@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Nuevo Protocolo Aramco 2025 Rosario Carretera</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de colores basada en el logo de Aramco Digital */
+            --primary-color: #00a859; /* Verde del logo */
+            --secondary-color: #009fe3; /* Azul del logo */
+            --text-color-dark: #333d47; /* Gris oscuro del logo */
+            --correct-color: #00a859;
+            --incorrect-color: #e53e3e;
+            --bg-color: #f0f4f8; /* Un fondo más claro y moderno */
+            --text-color: #333d47;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .quiz-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .quiz-header p {
+            font-size: 1rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .quiz-body {
+            padding: 2rem;
+            position: relative;
+        }
+
+        #progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        #progress-bar {
+            height: 10px;
+            width: 0%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        #question-counter {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        #question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .options {
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option {
+            background-color: var(--bg-color);
+            border: 2px solid #e0e0e0;
+            color: var(--text-color);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .option:hover:not([disabled]) {
+            background-color: #e9ecef;
+            border-color: var(--primary-color);
+        }
+        
+        .option:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.3);
+        }
+
+        .option.correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+            font-weight: bold;
+            animation: tada 0.8s ease;
+        }
+
+        .option.incorrect {
+            background-color: var(--incorrect-color);
+            border-color: var(--incorrect-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .option[disabled] {
+            cursor: not-allowed;
+        }
+        
+        .quiz-container.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        #results-container {
+            text-align: center;
+            display: none;
+            padding: 2rem;
+        }
+        
+        #score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        #results-container h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        #video-feedback-container {
+            margin: 1.5rem 0;
+        }
+
+        #feedback-video {
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+        }
+
+        #summary-container {
+            margin-top: 2rem;
+            text-align: left;
+        }
+        
+        .summary-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .summary-item p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .summary-item .summary-question {
+            font-weight: bold;
+        }
+        
+        .summary-item .summary-explanation {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        .summary-correct { border-color: var(--correct-color); }
+        .summary-incorrect { border-color: var(--incorrect-color); }
+        
+        .summary-answer {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .user-answer.correct { background-color: var(--correct-color); }
+        .user-answer.incorrect { background-color: var(--incorrect-color); }
+        .correct-answer { background-color: var(--secondary-color); }
+
+
+        #retry-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: background-color 0.2s;
+        }
+
+        #retry-btn:hover {
+            background-color: #008a48;
+        }
+        
+        /* Definición de Animaciones */
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+
+        @keyframes tada {
+            from { transform: scale3d(1, 1, 1); }
+            10%, 20% { transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg); }
+            30%, 50%, 70%, 90% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg); }
+            40%, 60%, 80% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg); }
+            to { transform: scale3d(1, 1, 1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .quiz-body, .quiz-header, #results-container {
+                padding: 1.5rem;
+            }
+            .quiz-header h1 {
+                font-size: 1.5rem;
+            }
+             #question {
+                font-size: 1.1rem;
+            }
+            .option {
+                font-size: 0.9rem;
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="quiz-container">
+        <div class="quiz-header">
+            <h1>Nuevo Protocolo Aramco 2025 Rancagua Kennedy</h1>
+            <p>Evaluación de conocimientos sobre el nuevo protocolo.</p>
+        </div>
+        <div class="quiz-body">
+             <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="question-counter"></div>
+            <h2 id="question">Cargando pregunta...</h2>
+            <div class="options" id="options-container">
+                <!-- Las opciones se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+        <div id="results-container">
+            <h2>¡Quiz Completado!</h2>
+            <p id="score-text">Tu puntaje final es:</p>
+            <p id="score">0 / 30</p>
+            <div id="video-feedback-container" style="display: none;">
+                <video id="feedback-video" autoplay muted playsinline loop>
+                    Tu navegador no soporta videos.
+                </video>
+            </div>
+            <button id="retry-btn">Volver a Intentar</button>
+            <div id="summary-container">
+                 <!-- El resumen se cargará aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- INICIO DE LA LÓGICA DEL QUIZ ---
+
+        const quizData = [
+            {
+                pregunta: "¿Cuál es el principal objetivo del nuevo protocolo de servicio?",
+                opciones: ["Vender más lubricantes", "Potenciar el uso de la app como medio de pago", "Disminuir el uso de efectivo"],
+                respuestaCorrecta: "Potenciar el uso de la app como medio de pago",
+                explicacion: "El objetivo fundamental es alinear los protocolos para facilitar y potenciar el uso de la app Aramco como medio de pago y acumulación."
+            },
+            {
+                pregunta: "En 'Validación de Beneficios', ¿qué se propone eliminar para agilizar el proceso?",
+                opciones: ["Preguntar el RUT", "La identificación del Programa de Acumulación en el terminal", "La selección de beneficios"],
+                respuestaCorrecta: "La identificación del Programa de Acumulación en el terminal",
+                explicacion: "Se elimina este paso para hacer el proceso más fluido, enfocándose solo en la selección de beneficios que el cliente ya posee."
+            },
+            {
+                pregunta: "¿Cuál es el saludo inicial que debe dar el vendedor?",
+                opciones: ["¡Hola, buenos días!", "¡Bienvenido(a) Aramco!", "¿En qué le puedo ayudar?"],
+                respuestaCorrecta: "¡Bienvenido(a) Aramco!",
+                explicacion: "El protocolo especifica este saludo para estandarizar y fortalecer la identidad de la marca desde el primer contacto."
+            },
+            {
+                pregunta: "Para verificar los beneficios de un cliente, ¿qué debe solicitar el vendedor?",
+                opciones: ["Su número de teléfono", "Su RUT", "Su nombre completo"],
+                respuestaCorrecta: "Su RUT",
+                explicacion: "El vendedor debe pedir el RUT para ingresarlo en el terminal y comprobar si existen beneficios disponibles para el cliente."
+            },
+            {
+                pregunta: "Si un cliente no tiene beneficios, ¿cuál es el siguiente paso?",
+                opciones: ["Ofrecerle registrarse en la app", "Continuar con el protocolo de venta activa", "Informarle de las promociones"],
+                respuestaCorrecta: "Continuar con el protocolo de venta activa",
+                explicacion: "Para no generar fricción y cuidar el tiempo del cliente, el protocolo indica continuar con el siguiente paso sin demora."
+            },
+            {
+                pregunta: "¿En qué momento es ideal invitar al cliente a usar la app?",
+                opciones: ["En el saludo", "Durante la carga de combustible", "En la despedida"],
+                respuestaCorrecta: "Durante la carga de combustible",
+                explicacion: "Es el momento perfecto porque el cliente está esperando y es más receptivo a recibir información sobre los beneficios de la app."
+            },
+            {
+                pregunta: "¿Qué frase específica debe usar el vendedor para promover la app?",
+                opciones: ["'Con la app paga más rápido'", "'Pagando con la App acumula Millas Latam Pass o pesos Mi Club Lider'", "'¿Ya conoce nuestra app?'"],
+                respuestaCorrecta: "'Pagando con la App acumula Millas Latam Pass o pesos Mi Club Lider'",
+                explicacion: "Esta frase es clave porque comunica de forma directa y concreta el valor de usar la app (acumulación de beneficios)."
+            },
+            {
+                pregunta: "Antes de cargar, es fundamental que el vendedor indique al cliente que...",
+                opciones: ["...el precio ha subido.", "...el surtidor está en cero.", "...el servicio será rápido."],
+                respuestaCorrecta: "...el surtidor está en cero.",
+                explicacion: "Este paso es crucial para garantizar la transparencia y la confianza, asegurándose que el cliente observe el marcador."
+            },
+            {
+                pregunta: "Al momento de cobrar, ¿cuál es la pregunta correcta que debe hacer el vendedor?",
+                opciones: ["'¿Cómo desea pagar?'", "'¿Va a pagar con la App Aramco?'", "'¿Necesita boleta o factura?'"],
+                respuestaCorrecta: "'¿Va a pagar con la App Aramco?'",
+                explicacion: "La pregunta es directa y está orientada a potenciar el uso de la app como primera opción de pago."
+            },
+            {
+                pregunta: "Si un cliente paga con la app en un terminal tipo Resmax, ¿qué debe escanear?",
+                opciones: ["Un código de barras", "El código QR", "La patente del vehículo"],
+                respuestaCorrecta: "El código QR",
+                explicacion: "El protocolo especifica que para terminales Resmax, el pago se realiza escaneando el código QR."
+            },
+             {
+                pregunta: "Si un cliente paga con la app en un terminal tipo Platino, ¿qué debe escanear?",
+                opciones: ["El código de barras", "El código QR", "La pantalla del surtidor"],
+                respuestaCorrecta: "El código de barras",
+                explicacion: "A diferencia de Resmax, el protocolo indica que para terminales Platino se debe escanear el código de barras."
+            },
+            {
+                pregunta: "Para reforzar la calidad, ¿qué frase debe decir el vendedor en el pago?",
+                opciones: ["'Gracias por preferir calidad'", "'Ha cargado combustible con la última tecnología'", "'Su vehículo funcionará mejor'"],
+                respuestaCorrecta: "'Ha cargado combustible con la última tecnología'",
+                explicacion: "Esta frase está diseñada para reforzar la propuesta de valor de la marca Aramco y su Nueva Fórmula."
+            },
+            {
+                pregunta: "Cuando un cliente PAGA CON LA APP, ¿quién lo invita a evaluar la experiencia?",
+                opciones: ["El vendedor", "Un correo electrónico", "La propia aplicación"],
+                respuestaCorrecta: "La propia aplicación",
+                explicacion: "El flujo de la app ya integra la invitación a evaluar, por lo que el vendedor no debe mencionarlo para no ser redundante."
+            },
+            {
+                pregunta: "Si un cliente NO PAGA con la app, ¿cómo se le invita a evaluar?",
+                opciones: ["'Por favor, evalúenos en Google'", "'Lo invito a evaluar su experiencia al reverso de la boleta'", "No es necesario invitarlo"],
+                respuestaCorrecta: "'Lo invito a evaluar su experiencia al reverso de la boleta'",
+                explicacion: "Para pagos tradicionales, la boleta física es el canal para dirigir al cliente a la encuesta de satisfacción."
+            },
+            {
+                pregunta: "Si un cliente pide más detalles sobre la app, el vendedor debe...",
+                opciones: ["...darle un folleto.", "...invitarlo a escanear la cartilla de su lanyard.", "...dirigirlo a la oficina."],
+                respuestaCorrecta: "...invitarlo a escanear la cartilla de su lanyard.",
+                explicacion: "La cartilla en el lanyard es la herramienta designada para que el cliente obtenga más información de forma autónoma y rápida."
+            },
+            {
+                pregunta: "¿Cuál es la frase de despedida estandarizada en el protocolo?",
+                opciones: ["'¡Gracias por su visita!'", "'¡Que tenga un buen viaje!'", "'¡Que tenga un buen día!, ¡Gracias por venir!.'"],
+                respuestaCorrecta: "'¡Que tenga un buen día!, ¡Gracias por venir!.'",
+                explicacion: "Esta despedida es la indicada para cerrar el servicio de manera amable y profesional."
+            },
+            {
+                pregunta: "¿Por qué es clave ser rápido en las etapas de Saludo y Validación de Beneficios?",
+                opciones: ["Porque hay metas de tiempo", "Para cuidar el tiempo del cliente y evitar fricciones", "Para atender a más autos"],
+                respuestaCorrecta: "Para cuidar el tiempo del cliente y evitar fricciones",
+                explicacion: "El cliente busca un servicio fluido. Demorar el inicio con información innecesaria genera una mala experiencia."
+            },
+            {
+                pregunta: "¿Qué acción proactiva, además de la carga, debe ofrecer el vendedor?",
+                opciones: ["Revisar el aceite", "Ofrecer limpiar los vidrios", "Calibrar los neumáticos"],
+                respuestaCorrecta: "Ofrecer limpiar los vidrios",
+                explicacion: "El protocolo lo menciona explícitamente como una actitud proactiva que mejora la percepción del servicio."
+            },
+             {
+                pregunta: "Tras indicar los litros y el total, ¿qué debe hacer el vendedor?",
+                opciones: ["Preguntar si paga con la APP Aramco", "Entregar la boleta", "Preguntar si necesita factura"],
+                respuestaCorrecta: "Preguntar si paga con la APP Aramco",
+                explicacion: "Este es un paso crucial para impulsar el objetivo principal del protocolo: fomentar el pago con la aplicación."
+            },
+            {
+                pregunta: "Si un cliente paga con la app, el vendedor entrega la boleta y luego...",
+                opciones: ["...le pide que evalúe.", "...continúa directamente con la despedida.", "...le recuerda los beneficios."],
+                respuestaCorrecta: "...continúa directamente con la despedida.",
+                explicacion: "El flujo es simple: se entrega la boleta y se procede a la despedida, ya que la app se encarga de la invitación a evaluar."
+            },
+            {
+                pregunta: "¿Cuál es el primer paso del protocolo para reforzar la 'Presencia de Marca'?",
+                opciones: ["Ofrecer limpiar vidrios", "El saludo '¡Bienvenido(a) Aramco!'", "Preguntar por el RUT"],
+                respuestaCorrecta: "El saludo '¡Bienvenido(a) Aramco!'",
+                explicacion: "El protocolo comienza con el saludo específico de la marca para establecer la identidad desde el primer momento."
+            },
+            {
+                pregunta: "Si un cliente tiene beneficios disponibles, ¿qué debe hacer el vendedor?",
+                opciones: ["Seleccionar el mejor beneficio", "Indicarle los beneficios y seleccionar el que elija", "Preguntar si los quiere usar hoy"],
+                respuestaCorrecta: "Indicarle los beneficios y seleccionar el que elija",
+                explicacion: "El vendedor debe informar al cliente sobre sus opciones y actuar según la elección del cliente para asegurar su consentimiento."
+            },
+            {
+                pregunta: "En la Venta Activa, además de preguntar cuánto va a cargar, ¿qué más se debe preguntar?",
+                opciones: ["Si es su primera visita", "¿Gasolina o Diesel?", "Si va a pagar con la app"],
+                respuestaCorrecta: "¿Gasolina o Diesel?",
+                explicacion: "Es fundamental confirmar el tipo de combustible para evitar errores en la carga."
+            },
+            {
+                pregunta: "¿Por qué se evita hablar de la app en las etapas iniciales del servicio?",
+                opciones: ["Porque la app solo se usa para pagar", "Para no generar una fricción evitable", "Porque los vendedores no están capacitados"],
+                respuestaCorrecta: "Para no generar una fricción evitable",
+                explicacion: "Las primeras etapas deben ser rápidas para que el cliente sienta que el servicio fluye; hablar de la app en ese momento puede ser una interrupción."
+            },
+            {
+                pregunta: "Cuando un cliente paga con la app, ¿qué acción principal debe indicar el vendedor?",
+                opciones: ["Que acerque su teléfono", "Que escanee el código correspondiente", "Que ingrese su clave en la app"],
+                respuestaCorrecta: "Que escanee el código correspondiente",
+                explicacion: "El pago se procesa mediante el escaneo de un código, que varía según el tipo de terminal (Platino o Resmax)."
+            },
+            {
+                pregunta: "Una diferencia clave en la entrega de boleta es que si el cliente paga con app...",
+                opciones: ["...no se entrega boleta.", "...el vendedor no invita a evaluar en la boleta.", "...la boleta tiene un descuento."],
+                respuestaCorrecta: "...el vendedor no invita a evaluar en la boleta.",
+                explicacion: "Si el pago es con la app, la propia aplicación invita a evaluar. Si no, el vendedor invita a hacerlo usando el reverso de la boleta."
+            },
+            {
+                pregunta: "La cartilla en el lanyard del vendedor se usa cuando el cliente...",
+                opciones: ["...paga con la app.", "...no tiene beneficios.", "...solicita mayor información."],
+                respuestaCorrecta: "...solicita mayor información.",
+                explicacion: "Es la herramienta de apoyo para dar más detalles al cliente que muestra interés, sin interrumpir el flujo normal del servicio."
+            },
+            {
+                pregunta: "Además de potenciar la app, ¿qué otro atributo clave de Aramco se debe reforzar?",
+                opciones: ["La rapidez del servicio", "La 'Nueva Fórmula' de sus combustibles", "Los precios competitivos"],
+                respuestaCorrecta: "La 'Nueva Fórmula' de sus combustibles",
+                explicacion: "El protocolo busca reforzar los atributos de valor de la marca, y la 'Nueva Fórmula' es uno de los más importantes."
+            },
+            {
+                pregunta: "¿Qué dos programas de lealtad se mencionan como acumulables al pagar con la app?",
+                opciones: ["Puntos Cencosud y Millas LATAM Pass", "Pesos Mi Club Lider y Puntos Ripley", "Millas LATAM Pass y pesos Mi Club Lider"],
+                respuestaCorrecta: "Millas LATAM Pass y pesos Mi Club Lider",
+                explicacion: "Son los dos partners de acumulación que se comunican activamente en el protocolo."
+            },
+            {
+                pregunta: "La invitación a usar la app se traslada desde la validación de beneficios hacia...",
+                opciones: ["La despedida y el saludo", "La venta activa y el pago", "Solo al momento del pago"],
+                respuestaCorrecta: "La venta activa y el pago",
+                explicacion: "Se mueve la invitación a momentos donde el cliente está más receptivo (durante la carga) y cuando es contextualmente relevante (al pagar)."
+            }
+        ];
+        
+        // --- Lógica de Sonido (Web Audio API) ---
+        let audioCtx;
+        function initAudio() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.error("Web Audio API is not supported in this browser");
+            }
+        }
+        
+        function playSound(type) {
+            if (!audioCtx) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+            if (type === 'correct') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'incorrect') {
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        const quizContainer = document.getElementById('quiz-container');
+        const questionEl = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreEl = document.getElementById('score');
+        const retryBtn = document.getElementById('retry-btn');
+        const summaryContainer = document.getElementById('summary-container');
+        const questionCounterEl = document.getElementById('question-counter');
+        const progressBarEl = document.getElementById('progress-bar');
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const userAnswers = [];
+        let shuffledQuizData = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            shuffledQuizData = [...quizData];
+            shuffleArray(shuffledQuizData);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers.length = 0;
+
+            document.getElementById('video-feedback-container').style.display = 'none';
+            resultsContainer.style.display = 'none';
+            document.querySelector('.quiz-body').style.display = 'block';
+            document.querySelector('.quiz-header').style.display = 'block';
+            
+            loadQuiz();
+        }
+
+        function loadQuiz() {
+            const currentQuizData = shuffledQuizData[currentQuestionIndex];
+            
+            questionEl.innerText = currentQuizData.pregunta;
+            questionCounterEl.innerText = `Pregunta ${currentQuestionIndex + 1} de ${shuffledQuizData.length}`;
+            progressBarEl.style.width = `${((currentQuestionIndex) / shuffledQuizData.length) * 100}%`;
+
+            optionsContainer.innerHTML = '';
+            
+            const shuffledOptions = [...currentQuizData.opciones];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach(opcion => {
+                const button = document.createElement('button');
+                button.innerText = opcion;
+                button.classList.add('option');
+                button.addEventListener('click', () => selectAnswer(button, opcion));
+                optionsContainer.appendChild(button);
+            });
+             progressBarEl.style.width = `${((currentQuestionIndex + 1) / shuffledQuizData.length) * 100}%`;
+        }
+        
+        function selectAnswer(button, selectedOption) {
+            if (!audioCtx) {
+                initAudio();
+            }
+
+            const options = optionsContainer.getElementsByClassName('option');
+            for (let opt of options) {
+                opt.disabled = true;
+            }
+
+            const currentQuizData = shuffledQuizData[currentQuestionIndex];
+            const correctAnswer = currentQuizData.respuestaCorrecta;
+            
+            userAnswers[currentQuestionIndex] = selectedOption;
+
+            if (selectedOption === correctAnswer) {
+                score++;
+                button.classList.add('correct');
+                playSound('correct');
+
+            } else {
+                button.classList.add('incorrect');
+                quizContainer.classList.add('shake');
+                quizContainer.addEventListener('animationend', () => {
+                    quizContainer.classList.remove('shake');
+                }, { once: true });
+
+                Array.from(options).forEach(opt => {
+                    if (opt.innerText === correctAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+                playSound('incorrect');
+            }
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < shuffledQuizData.length) {
+                    loadQuiz();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        function showResults() {
+            document.querySelector('.quiz-body').style.display = 'none';
+            document.querySelector('.quiz-header').style.display = 'none';
+            resultsContainer.style.display = 'block';
+            resultsContainer.style.animation = 'fadeIn 0.5s ease-in-out';
+
+            scoreEl.innerText = `${score} / ${shuffledQuizData.length}`;
+
+            const videoContainer = document.getElementById('video-feedback-container');
+            const videoEl = document.getElementById('feedback-video');
+            
+            // **IMPORTANTE**: Asegúrate de tener los archivos 'aprobacion.mp4' y 'decepcion.mp4'
+            // en la misma carpeta que este archivo index.html.
+            if (score >= 28) {
+                videoEl.src = 'aprobacion.mp4';
+                videoContainer.style.display = 'block';
+            } else {
+                videoEl.src = 'decepcion.mp4';
+                videoContainer.style.display = 'block';
+            }
+            
+            summaryContainer.innerHTML = '<h3>Resumen de Respuestas</h3>';
+            shuffledQuizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.respuestaCorrecta;
+
+                const summaryItem = document.createElement('div');
+                summaryItem.classList.add('summary-item');
+                summaryItem.classList.add(isCorrect ? 'summary-correct' : 'summary-incorrect');
+
+                summaryItem.innerHTML = `
+                    <p class="summary-question">${index + 1}. ${questionData.pregunta}</p>
+                    <p>Tu respuesta: <span class="summary-answer user-answer ${isCorrect ? 'correct' : 'incorrect'}">${userAnswer}</span></p>
+                    ${!isCorrect ? `<p>Respuesta correcta: <span class="summary-answer correct-answer">${questionData.respuestaCorrecta}</span></p>` : ''}
+                    <p class="summary-explanation"><strong>Explicación:</strong> ${questionData.explicacion}</p>
+                `;
+                summaryContainer.appendChild(summaryItem);
+            });
+        }
+        
+        retryBtn.addEventListener('click', startQuiz);
+        
+        document.addEventListener('DOMContentLoaded', startQuiz);
+
+    </script>
+</body>
+</html>
+
