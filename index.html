@@ -661,14 +661,17 @@
             const videoContainer = document.getElementById('video-feedback-container');
             const videoEl = document.getElementById('feedback-video');
             
-            // **IMPORTANTE**: Asegúrate de tener los archivos 'aprobacion.mp4' y 'decepcion.mp4'
-            // en la misma carpeta que este archivo index.html.
-            if (score >= 28) {
+            // **IMPORTANTE**: Asegúrate de tener los archivos de video ('perfecto.mp4', 'aprobacion.mp4', 
+            // 'masomenos.mp4', 'decepcion.mp4') en la misma carpeta que este archivo index.html.
+            videoContainer.style.display = 'block'; // Show container for all cases
+            if (score === 30) {
+                videoEl.src = 'perfecto.mp4';
+            } else if (score >= 28 && score <= 29) {
                 videoEl.src = 'aprobacion.mp4';
-                videoContainer.style.display = 'block';
-            } else {
+            } else if (score >= 24 && score <= 27) {
+                videoEl.src = 'masomenos.mp4';
+            } else { // Scores below 24
                 videoEl.src = 'decepcion.mp4';
-                videoContainer.style.display = 'block';
             }
             
             summaryContainer.innerHTML = '<h3>Resumen de Respuestas</h3>';
@@ -697,5 +700,3 @@
     </script>
 </body>
 </html>
-
-
